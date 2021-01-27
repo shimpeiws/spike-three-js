@@ -90,13 +90,17 @@ window.addEventListener("DOMContentLoaded", () => {
   // シーンを作成
   const scene = new THREE.Scene();
 
+  const axes = new THREE.AxesHelper(250);
+  axes.position.set(200, 200, 500);
+  scene.add(axes);
+
   // カメラを作成
   const camera = new THREE.PerspectiveCamera(45, 800 / 600, 1, 10000);
-  camera.position.set(0, 0, 1000);
+  camera.position.set(200, 200, 500);
 
   for (let landMark of landMarks) {
     const circleGeometry = new THREE.Mesh(
-      new THREE.CircleGeometry(10, 10, 10),
+      new THREE.CircleGeometry(5, 5, 5),
       new THREE.MeshLambertMaterial({
         color: 0xffffff,
       })
