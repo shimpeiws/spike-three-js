@@ -1,3 +1,5 @@
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 import * as THREE from "three";
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -40,3 +42,5 @@ window.addEventListener("DOMContentLoaded", () => {
 
   console.log("Hello Three.js");
 });
+
+ReactDOM.render(<h1>spike-three-js</h1>, document.getElementById("app"));
