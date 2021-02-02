@@ -1,10 +1,16 @@
 {
   "compilerOptions": {
     "target": "es6",
+    "module": "ES2020",
+    "jsx": "react",
     "moduleResolution": "node",
+    "lib": [
+      "es2020",
+      "dom"
+    ],
     "outDir": "./dist/"
   },
-  "include": [
-    "./src/**/*.ts"
-  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

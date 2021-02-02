@@ -3,7 +3,7 @@ var path = require('path');
 module.exports = {
   mode: 'development',
 
-  entry: './src/main.ts',
+  entry: './src/main.tsx',
 
   output: {
     filename: "./js/bundle.js"
@@ -12,14 +12,14 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.tsx?$/,
         use: 'ts-loader',
       },
     ],
   },
   resolve: {
     extensions: [
-      '.ts', '.js',
+      '.ts', '.tsx', '.js',
     ],
   },
 
