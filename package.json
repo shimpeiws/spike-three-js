@@ -15,6 +15,7 @@
     "@types/react-dom": "^17.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-three-fiber": "^5.3.18",
     "three": "^0.124.0"
   },
   "devDependencies": {
