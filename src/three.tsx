@@ -84,14 +84,21 @@ type DotProps = {
   positionZ: number;
 };
 
+let rot = 0; // 角度
+let mouseX = 0; // マウス座標
+
+// マウス座標はマウスが動いた時のみ取得できる
+document.addEventListener("mousemove", (event) => {
+  mouseX = event.pageX;
+});
+
 function Rig() {
-  const [rot, setRot] = React.useState(0);
-  const { camera, mouse } = useThree();
+  const { camera } = useThree();
   return useFrame(() => {
-    const targetRot = (mouse.x / mouse.y) * 360;
-    const r = (targetRot - rot) * 0.02;
-    setRot(r);
-    const radian = (r * Math.PI) / 180;
+    console.log(mouseX);
+    const targetRot = (mouseX / window.innerWidth) * 360;
+    rot += (targetRot - rot) * 0.02;
+    const radian = (rot * Math.PI) / 180;
     camera.position.x = 1000 * Math.sin(radian);
     camera.position.z = 1000 * Math.cos(radian);
   });
@@ -106,7 +113,7 @@ function Dot(props: DotProps) {
       position={[props.positionX, props.positionY, props.positionZ]}
     >
       <circleGeometry attach="geometry" args={[5, 5, 5]} />
-      <meshLambertMaterial color="0xffffff" />
+      <meshLambertMaterial color="#FFFFFF" />
     </mesh>
   );
 }
