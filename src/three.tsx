@@ -1,10 +1,6 @@
 import * as React from "react";
-import { Canvas, useFrame } from "react-three-fiber";
-
-type Props = {
-  mouseX: number;
-  rot: number;
-};
+import { Canvas, useFrame, useThree } from "react-three-fiber";
+import { MeshLambertMaterial } from "three";
 
 const landMarks = [
   [242, 122, 63.754154205322266],
@@ -77,89 +73,61 @@ const landMarks = [
   [258, 236, -1.2894983291625977],
 ];
 
-// export const ThreeComponent: React.FC<Props> = (props) => {
-//   function Circle(props) {
-//     // This reference will give us direct access to the mesh
-//     const mesh = React.useRef();
+type Props = {
+  mouseX: number;
+  rot: number;
+};
 
-//     // Rotate mesh every frame, this is outside of React without overhead
-//     useFrame(() => {
-//       const current = mesh.current as any;
-//       // current.rotation.x = current.rotation.y += 0.01;
-//     });
+type DotProps = {
+  positionX: number;
+  positionY: number;
+  positionZ: number;
+};
 
-//     return (
-//       <mesh position={props.position}>
-//         <circleGeometry args={[5, 5, 5]} />
-//         <meshLambertMaterial color="white" />
-//       </mesh>
-//     );
-//   }
-
-//   return (
-//     <Canvas>
-//       <ambientLight />
-//       <pointLight position={[1, 1, 1]} />
-//       <Circle position={[351, 240, -103.40164184570312]} />
-//       {/* <Circle position={[1.2, 0, 0]} /> */}
-//     </Canvas>
-//   );
-// };
-
-function Box(props) {
-  // This reference will give us direct access to the mesh
-  const mesh = React.useRef();
-
-  // Set up state for the hovered and active state
-  const [hovered, setHover] = React.useState(false);
-  const [active, setActive] = React.useState(false);
-
-  // Rotate mesh every frame, this is outside of React without overhead
-  useFrame(() => {
-    const current = mesh.current as any;
-    current.rotation.x = current.rotation.y += 0.01;
+function Rig() {
+  const [rot, setRot] = React.useState(0);
+  const { camera, mouse } = useThree();
+  return useFrame(() => {
+    const targetRot = (mouse.x / mouse.y) * 360;
+    const r = (targetRot - rot) * 0.02;
+    setRot(r);
+    const radian = (r * Math.PI) / 180;
+    camera.position.x = 1000 * Math.sin(radian);
+    camera.position.z = 1000 * Math.cos(radian);
   });
+}
+
+function Dot(props: DotProps) {
+  const ref = React.useRef();
 
   return (
     <mesh
-      {...props}
-      ref={mesh}
-      scale={active ? [1.5, 1.5, 1.5] : [1, 1, 1]}
-      onClick={(event) => setActive(!active)}
-      onPointerOver={(event) => setHover(true)}
-      onPointerOut={(event) => setHover(false)}
+      ref={ref}
+      position={[props.positionX, props.positionY, props.positionZ]}
     >
-      <boxBufferGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={hovered ? "hotpink" : "orange"} />
+      <circleGeometry attach="geometry" args={[5, 5, 5]} />
+      <meshLambertMaterial color="0xffffff" />
     </mesh>
   );
 }
 
 export const ThreeComponent: React.FC<Props> = (props) => {
-  function Circle(props) {
-    // This reference will give us direct access to the mesh
-    const mesh = React.useRef();
-
-    // Rotate mesh every frame, this is outside of React without overhead
-    useFrame(() => {
-      const current = mesh.current as any;
-      // current.rotation.x = current.rotation.y += 0.01;
-    });
-
-    return (
-      <mesh position={props.position}>
-        <circleGeometry args={[5, 5, 5]} />
-        <meshLambertMaterial color="white" />
-      </mesh>
-    );
-  }
-
   return (
-    <Canvas>
-      <ambientLight />
-      <pointLight position={[10, 10, 10]} />
-      <Box position={[-1.2, 0, 0]} />
-      <Box position={[1.2, 0, 0]} />
-    </Canvas>
+    <div style={{ width: "100vw", height: "100vh", backgroundColor: "black" }}>
+      <Canvas camera={{ position: [200, 200, 500] }}>
+        <directionalLight color="#FFFFFF" intensity={1} position={[1, 1, 1]} />
+        {landMarks.map((landMark, idx) => {
+          return (
+            <Dot
+              key={idx}
+              positionX={landMark[0]}
+              positionY={landMark[1]}
+              positionZ={landMark[2]}
+            />
+          );
+        })}
+        <Rig />
+      </Canvas>
+    </div>
   );
 };
