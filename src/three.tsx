@@ -142,7 +142,7 @@ function Dot(props: DotProps) {
   return (
     <mesh
       ref={ref}
-      position={[props.positionX, props.positionY, props.positionZ]}
+      position={[props.positionX, props.positionY * -1 + 350, props.positionZ]}
     >
       <circleGeometry attach="geometry" args={[5, 5, 5]} />
       <meshLambertMaterial color="#FFFFFF" />
