@@ -1,6 +1,13 @@
 import * as React from "react";
 import { Canvas, useFrame, useThree } from "react-three-fiber";
-import { MeshLambertMaterial } from "three";
+import { MeshLambertMaterial, Mesh } from "three";
+
+const box = {
+  h: 248,
+  w: 168,
+  x: 209,
+  y: 88,
+};
 
 const landMarks = [
   [242, 122, 63.754154205322266],
@@ -73,10 +80,7 @@ const landMarks = [
   [258, 236, -1.2894983291625977],
 ];
 
-type Props = {
-  mouseX: number;
-  rot: number;
-};
+type Props = {};
 
 type DotProps = {
   positionX: number;
@@ -84,24 +88,52 @@ type DotProps = {
   positionZ: number;
 };
 
+type WallProps = {
+  h: number;
+  w: number;
+  x: number;
+  y: number;
+  z: number;
+  rotationX: number;
+  rotationY: number;
+};
+
 let rot = 0; // 角度
 let mouseX = 0; // マウス座標
+let mouseY = 0; // マウス座標
 
 // マウス座標はマウスが動いた時のみ取得できる
 document.addEventListener("mousemove", (event) => {
   mouseX = event.pageX;
+  mouseY = event.pageY;
 });
 
 function Rig() {
   const { camera } = useThree();
   return useFrame(() => {
-    console.log(mouseX);
     const targetRot = (mouseX / window.innerWidth) * 360;
     rot += (targetRot - rot) * 0.02;
     const radian = (rot * Math.PI) / 180;
     camera.position.x = 1000 * Math.sin(radian);
     camera.position.z = 1000 * Math.cos(radian);
+    camera.position.y = mouseY;
   });
+}
+
+function Wall(props: WallProps) {
+  const ref = React.useRef({} as Mesh);
+  useFrame(() => {
+    console.info(ref.current.rotation.x);
+    ref.current.rotation.x = props.rotationX;
+    ref.current.rotation.y = props.rotationY;
+  });
+
+  return (
+    <mesh ref={ref} position={[props.x, props.y, props.z]}>
+      <planeGeometry attach="geometry" args={[props.h, props.w, 500]} />
+      <meshLambertMaterial color="#FFFFFF" />
+    </mesh>
+  );
 }
 
 function Dot(props: DotProps) {
@@ -121,8 +153,38 @@ function Dot(props: DotProps) {
 export const ThreeComponent: React.FC<Props> = (props) => {
   return (
     <div style={{ width: "100vw", height: "100vh", backgroundColor: "black" }}>
-      <Canvas camera={{ position: [200, 200, 500] }}>
-        <directionalLight color="#FFFFFF" intensity={1} position={[1, 1, 1]} />
+      <Canvas>
+        <directionalLight color="#FFFFFF" intensity={1} position={[2, 1, 1]} />
+        <mesh position={[200, 200, 500]}>
+          <axesHelper />
+        </mesh>
+        <Wall
+          h={box.h}
+          w={box.w}
+          x={box.x}
+          y={box.y}
+          z={100}
+          rotationX={0}
+          rotationY={0}
+        />
+        <Wall
+          h={box.h}
+          w={box.w}
+          x={box.x + 10}
+          y={box.y - 60}
+          z={20}
+          rotationX={5}
+          rotationY={0}
+        />
+        <Wall
+          h={box.h}
+          w={box.w}
+          x={box.x - 160}
+          y={box.y}
+          z={0}
+          rotationX={0}
+          rotationY={5}
+        />
         {landMarks.map((landMark, idx) => {
           return (
             <Dot
