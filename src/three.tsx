@@ -93,7 +93,9 @@ type WallProps = {
   w: number;
   x: number;
   y: number;
-  rotation: number;
+  z: number;
+  rotationX: number;
+  rotationY: number;
 };
 
 let rot = 0; // 角度
@@ -122,11 +124,12 @@ function Wall(props: WallProps) {
   const ref = React.useRef({} as Mesh);
   useFrame(() => {
     console.info(ref.current.rotation.x);
-    ref.current.rotation.x = props.rotation;
+    ref.current.rotation.x = props.rotationX;
+    ref.current.rotation.y = props.rotationY;
   });
 
   return (
-    <mesh ref={ref} position={[props.x, props.y, 200]}>
+    <mesh ref={ref} position={[props.x, props.y, props.z]}>
       <planeGeometry attach="geometry" args={[props.h, props.w, 500]} />
       <meshLambertMaterial color="#FFFFFF" />
     </mesh>
@@ -159,15 +162,28 @@ export const ThreeComponent: React.FC<Props> = (props) => {
           h={box.h}
           w={box.w}
           x={box.x}
-          y={box.y + box.h / 3}
-          rotation={0}
+          y={box.y}
+          z={100}
+          rotationX={0}
+          rotationY={0}
         />
         <Wall
           h={box.h}
           w={box.w}
-          x={box.x - box.w / 3}
+          x={box.x + 10}
+          y={box.y - 60}
+          z={20}
+          rotationX={5}
+          rotationY={0}
+        />
+        <Wall
+          h={box.h}
+          w={box.w}
+          x={box.x - 160}
           y={box.y}
-          rotation={5}
+          z={0}
+          rotationX={0}
+          rotationY={5}
         />
         {landMarks.map((landMark, idx) => {
           return (
