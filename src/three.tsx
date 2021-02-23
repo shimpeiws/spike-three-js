@@ -191,7 +191,7 @@ function Dot(props: DotProps) {
 export const ThreeComponent: React.FC<Props> = (props) => {
   const { x, y, z } = React.useContext(CameraPositionContext);
   const [frames, setFrames] = React.useState<number>(0);
-  const [j, setJ] = React.useState<Content[]>([]);
+  const [forceUpdate, setForceUpdate] = React.useState(0);
 
   React.useEffect(() => {
     const req = new XMLHttpRequest();
@@ -206,7 +206,7 @@ export const ThreeComponent: React.FC<Props> = (props) => {
         console.info("res", res);
         setFrames(res.length);
         jsonContent = res;
-        setJ(res);
+        setForceUpdate(forceUpdate + 1);
       }
     };
   }, []);
