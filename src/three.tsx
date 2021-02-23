@@ -7,7 +7,7 @@ const box = {
   h: 248,
   w: 168,
   x: 209,
-  y: 88,
+  y: 88
 };
 
 const landMarks = [
@@ -78,8 +78,18 @@ const landMarks = [
   [307, 228, -38.4931526184082],
   [278, 240, -16.269901275634766],
   [270, 240, -8.610118865966797],
-  [258, 236, -1.2894983291625977],
+  [258, 236, -1.2894983291625977]
 ];
+
+type Content = {
+  bbox: {
+    h: number;
+    w: number;
+    x: number;
+    y: number;
+  };
+  landmarks: [number, number, number][];
+};
 
 type Props = {};
 
@@ -158,6 +168,27 @@ function Dot(props: DotProps) {
 
 export const ThreeComponent: React.FC<Props> = (props) => {
   const { x, y, z } = React.useContext(CameraPositionContext);
+  const [jsonContent, setJsonContent] = React.useState<Content[]>([]);
+
+  React.useEffect(() => {
+    const req = new XMLHttpRequest();
+    req.open("GET", "sample.json");
+    req.send();
+    req.onreadystatechange = function () {
+      if (req.readyState == 4 && req.status == 200) {
+        const json = JSON.parse(req.responseText);
+        const res = json.map((c: any[]) => {
+          return c[0];
+        }) as Content[];
+        setJsonContent(res);
+      }
+    };
+  }, []);
+
+  if (jsonContent.length === 0) {
+    return null;
+  }
+
   return (
     <div style={{ width: "100vw", height: "100vh", backgroundColor: "black" }}>
       <Canvas>
@@ -192,7 +223,7 @@ export const ThreeComponent: React.FC<Props> = (props) => {
           rotationX={0}
           rotationY={5}
         />
-        {landMarks.map((landMark, idx) => {
+        {jsonContent[0].landmarks.map((landMark, idx) => {
           return (
             <Dot
               key={idx}
