@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Canvas, useFrame, useThree } from "react-three-fiber";
 import { MeshLambertMaterial, Mesh } from "three";
+import { CameraPositionContext } from "./main";
 
 const box = {
   h: 248,
@@ -108,22 +109,27 @@ document.addEventListener("mousemove", (event) => {
   mouseY = event.pageY;
 });
 
-function Rig() {
+type RigProps = {
+  cameraX: number;
+  cameraY: number;
+  cameraZ: number;
+};
+
+function Rig(props: RigProps) {
   const { camera } = useThree();
   return useFrame(() => {
     const targetRot = (mouseX / window.innerWidth) * 360;
     rot += (targetRot - rot) * 0.02;
     const radian = (rot * Math.PI) / 180;
-    camera.position.x = 1000 * Math.sin(radian);
-    camera.position.z = 1000 * Math.cos(radian);
-    camera.position.y = mouseY;
+    camera.position.x = props.cameraX;
+    camera.position.z = props.cameraZ;
+    camera.position.y = props.cameraY;
   });
 }
 
 function Wall(props: WallProps) {
   const ref = React.useRef({} as Mesh);
   useFrame(() => {
-    console.info(ref.current.rotation.x);
     ref.current.rotation.x = props.rotationX;
     ref.current.rotation.y = props.rotationY;
   });
@@ -151,6 +157,7 @@ function Dot(props: DotProps) {
 }
 
 export const ThreeComponent: React.FC<Props> = (props) => {
+  const { x, y, z } = React.useContext(CameraPositionContext);
   return (
     <div style={{ width: "100vw", height: "100vh", backgroundColor: "black" }}>
       <Canvas>
@@ -195,7 +202,7 @@ export const ThreeComponent: React.FC<Props> = (props) => {
             />
           );
         })}
-        <Rig />
+        <Rig cameraX={x} cameraY={y} cameraZ={z} />
       </Canvas>
     </div>
   );
