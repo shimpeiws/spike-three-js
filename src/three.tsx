@@ -7,7 +7,7 @@ const box = {
   h: 248,
   w: 168,
   x: 209,
-  y: 88,
+  y: 88
 };
 
 const landMarks = [
@@ -78,12 +78,23 @@ const landMarks = [
   [307, 228, -38.4931526184082],
   [278, 240, -16.269901275634766],
   [270, 240, -8.610118865966797],
-  [258, 236, -1.2894983291625977],
+  [258, 236, -1.2894983291625977]
 ];
+
+type Content = {
+  bbox: {
+    h: number;
+    w: number;
+    x: number;
+    y: number;
+  };
+  landmarks: [number, number, number][];
+};
 
 type Props = {};
 
 type DotProps = {
+  index: number;
   positionX: number;
   positionY: number;
   positionZ: number;
@@ -103,6 +114,10 @@ let rot = 0; // 角度
 let mouseX = 0; // マウス座標
 let mouseY = 0; // マウス座標
 
+let currentFrame = 0;
+
+let jsonContent = [] as Content[];
+
 // マウス座標はマウスが動いた時のみ取得できる
 document.addEventListener("mousemove", (event) => {
   mouseX = event.pageX;
@@ -117,7 +132,15 @@ type RigProps = {
 
 function Rig(props: RigProps) {
   const { camera } = useThree();
+  const [currentSeconds, setCurrentSeconds] = React.useState(1);
   return useFrame(() => {
+    const e = new Date();
+    const seconds = e.getSeconds();
+    console.info("useFrame!!", currentFrame);
+    if (currentSeconds !== seconds) {
+      setCurrentSeconds(seconds);
+      currentFrame += 1;
+    }
     const targetRot = (mouseX / window.innerWidth) * 360;
     rot += (targetRot - rot) * 0.02;
     const radian = (rot * Math.PI) / 180;
@@ -143,7 +166,16 @@ function Wall(props: WallProps) {
 }
 
 function Dot(props: DotProps) {
-  const ref = React.useRef();
+  const ref = React.useRef({} as Mesh);
+
+  useFrame(() => {
+    ref.current.position.x =
+      jsonContent[currentFrame].landmarks[props.index][0];
+    ref.current.position.y =
+      jsonContent[currentFrame].landmarks[props.index][1] * -1 + 350;
+    ref.current.position.z =
+      jsonContent[currentFrame].landmarks[props.index][2];
+  });
 
   return (
     <mesh
@@ -158,6 +190,33 @@ function Dot(props: DotProps) {
 
 export const ThreeComponent: React.FC<Props> = (props) => {
   const { x, y, z } = React.useContext(CameraPositionContext);
+  const [frames, setFrames] = React.useState<number>(0);
+  const [forceUpdate, setForceUpdate] = React.useState(0);
+
+  React.useEffect(() => {
+    const req = new XMLHttpRequest();
+    req.open("GET", "sample.json");
+    req.send();
+    req.onreadystatechange = function () {
+      if (req.readyState == 4 && req.status == 200) {
+        const json = JSON.parse(req.responseText);
+        const res = json.map((c: any[]) => {
+          return c[0];
+        }) as Content[];
+        console.info("res", res);
+        setFrames(res.length);
+        jsonContent = res;
+        setForceUpdate(forceUpdate + 1);
+      }
+    };
+  }, []);
+
+  console.info("jsonContent", jsonContent);
+
+  if (jsonContent.length === 0) {
+    return null;
+  }
+
   return (
     <div style={{ width: "100vw", height: "100vh", backgroundColor: "black" }}>
       <Canvas>
@@ -192,10 +251,11 @@ export const ThreeComponent: React.FC<Props> = (props) => {
           rotationX={0}
           rotationY={5}
         />
-        {landMarks.map((landMark, idx) => {
+        {jsonContent[currentFrame].landmarks.map((landMark, idx) => {
           return (
             <Dot
               key={idx}
+              index={idx}
               positionX={landMark[0]}
               positionY={landMark[1]}
               positionZ={landMark[2]}
