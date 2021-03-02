@@ -15,6 +15,16 @@ type CameraPositions = {
   z: number;
 };
 
+export const MousePositionContext = React.createContext<MousePositions>({
+  mouseX: 0,
+  mouseY: 0
+});
+
+type MousePositions = {
+  mouseX: number;
+  mouseY: number;
+};
+
 type BUttonsProps = {
   onClickXPlus10: () => void;
   onClickXMinus10: () => void;
@@ -37,6 +47,14 @@ function Buttons(props: BUttonsProps) {
   );
 }
 
+let mouseX = 0;
+let mouseY = 0;
+
+document.addEventListener("mousemove", (event) => {
+  mouseX = event.pageX;
+  mouseY = event.pageY;
+});
+
 function Main() {
   const [cameraX, setCameraX] = React.useState(550);
   const [cameraY, setCameraY] = React.useState(0);
@@ -45,30 +63,32 @@ function Main() {
     <CameraPositionContext.Provider
       value={{ x: cameraX, y: cameraY, z: cameraZ }}
     >
-      <p>x: {cameraX}</p>
-      <p>y: {cameraY}</p>
-      <p>z: {cameraZ}</p>
-      <Buttons
-        onClickXPlus10={() => {
-          setCameraX(cameraX + 10);
-        }}
-        onClickXMinus10={() => {
-          setCameraX(cameraX - 10);
-        }}
-        onClickYPlus10={() => {
-          setCameraY(cameraY + 10);
-        }}
-        onClickYMinus10={() => {
-          setCameraY(cameraY - 10);
-        }}
-        onClickZPlus10={() => {
-          setCameraZ(cameraZ + 10);
-        }}
-        onClickZMinus10={() => {
-          setCameraZ(cameraZ - 10);
-        }}
-      />
-      <ThreeComponent />
+      <MousePositionContext.Provider value={{ mouseX, mouseY }}>
+        <p>x: {cameraX}</p>
+        <p>y: {cameraY}</p>
+        <p>z: {cameraZ}</p>
+        <Buttons
+          onClickXPlus10={() => {
+            setCameraX(cameraX + 10);
+          }}
+          onClickXMinus10={() => {
+            setCameraX(cameraX - 10);
+          }}
+          onClickYPlus10={() => {
+            setCameraY(cameraY + 10);
+          }}
+          onClickYMinus10={() => {
+            setCameraY(cameraY - 10);
+          }}
+          onClickZPlus10={() => {
+            setCameraZ(cameraZ + 10);
+          }}
+          onClickZMinus10={() => {
+            setCameraZ(cameraZ - 10);
+          }}
+        />
+        <ThreeComponent />
+      </MousePositionContext.Provider>
     </CameraPositionContext.Provider>
   );
 }
