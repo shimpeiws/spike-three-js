@@ -4,10 +4,10 @@ import { MeshLambertMaterial, Mesh } from "three";
 import { CameraPositionContext } from "./main";
 
 const box = {
-  h: 248,
-  w: 168,
-  x: 209,
-  y: 88
+  h: 590,
+  w: 170,
+  x: 205,
+  y: 311
 };
 
 const landMarks = [

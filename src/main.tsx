@@ -6,7 +6,7 @@ import { ThreeComponent } from "./three";
 export const CameraPositionContext = React.createContext<CameraPositions>({
   x: 0,
   y: 0,
-  z: 0,
+  z: 0
 });
 
 type CameraPositions = {
@@ -38,8 +38,8 @@ function Buttons(props: BUttonsProps) {
 }
 
 function Main() {
-  const [cameraX, setCameraX] = React.useState(400);
-  const [cameraY, setCameraY] = React.useState(100);
+  const [cameraX, setCameraX] = React.useState(550);
+  const [cameraY, setCameraY] = React.useState(0);
   const [cameraZ, setCameraZ] = React.useState(500);
   return (
     <CameraPositionContext.Provider
