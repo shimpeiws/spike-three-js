@@ -1,13 +1,13 @@
 import * as React from "react";
 import { Canvas, useFrame, useThree } from "react-three-fiber";
 import { MeshLambertMaterial, Mesh } from "three";
-import { CameraPositionContext } from "./main";
+import { CameraPositionContext, MousePositionContext } from "./main";
 
 const box = {
-  h: 248,
-  w: 168,
-  x: 209,
-  y: 88
+  h: 590,
+  w: 170,
+  x: 205,
+  y: 311
 };
 
 const landMarks = [
@@ -111,23 +111,17 @@ type WallProps = {
 };
 
 let rot = 0; // 角度
-let mouseX = 0; // マウス座標
-let mouseY = 0; // マウス座標
 
 let currentFrame = 0;
 
 let jsonContent = [] as Content[];
 
-// マウス座標はマウスが動いた時のみ取得できる
-document.addEventListener("mousemove", (event) => {
-  mouseX = event.pageX;
-  mouseY = event.pageY;
-});
-
 type RigProps = {
   cameraX: number;
   cameraY: number;
   cameraZ: number;
+  mouseX: number;
+  mouseY: number;
 };
 
 function Rig(props: RigProps) {
@@ -141,7 +135,7 @@ function Rig(props: RigProps) {
       setCurrentSeconds(seconds);
       currentFrame += 1;
     }
-    const targetRot = (mouseX / window.innerWidth) * 360;
+    const targetRot = (props.mouseX / window.innerWidth) * 360;
     rot += (targetRot - rot) * 0.02;
     const radian = (rot * Math.PI) / 180;
     camera.position.x = props.cameraX;
@@ -190,6 +184,7 @@ function Dot(props: DotProps) {
 
 export const ThreeComponent: React.FC<Props> = (props) => {
   const { x, y, z } = React.useContext(CameraPositionContext);
+  const { mouseX, mouseY } = React.useContext(MousePositionContext);
   const [frames, setFrames] = React.useState<number>(0);
   const [forceUpdate, setForceUpdate] = React.useState(0);
 
@@ -262,7 +257,13 @@ export const ThreeComponent: React.FC<Props> = (props) => {
             />
           );
         })}
-        <Rig cameraX={x} cameraY={y} cameraZ={z} />
+        <Rig
+          cameraX={x}
+          cameraY={y}
+          cameraZ={z}
+          mouseX={mouseX}
+          mouseY={mouseY}
+        />
       </Canvas>
     </div>
   );
